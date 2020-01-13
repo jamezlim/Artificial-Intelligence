@@ -31,20 +31,10 @@ public class Main {
 			int p1Score = 0;
 			int p2Score = 0;
 		
-			//System.out.printf("\n game %d \n", gameCount);//-------------------------------------------------------------------
 			// for each turn (state)
 			int turn = 0;
 			while ( p1Score < LTARGET && p2Score < LTARGET){
-					// ------------------------------------------------- Debugging pause
-					// try	{
-					// 	Thread.sleep(1000);
-					// }
-					// catch(InterruptedException ex)
-					// {
-					//     Thread.currentThread().interrupt();
-					// }
 
-				//System.out.printf("turn: %d\n", turn);//-------------------------------------------------------------------
 				HashMap <Integer,Float > fjMap = new HashMap<>();  
 				
 				int t = 0; // t is the total number of games that have gone through same state <X,Y>
@@ -57,30 +47,21 @@ public class Main {
 					t += temp; 
 
 					float fj; // fj is the probability of winning given player rolled j number of dice 
-					if (temp == 0) fj = 0.5000f;
-					else fj = (float) winCount[p1Score][p2Score][j] / (float) temp;
+					if (temp == 0) fj = 0.5f;
+					else fj = (float) winCount[p1Score][p2Score][j] / temp;
 
-					//System.out.printf(" fj before putting into fjMap: %f\n", fj);//-------------------------------------------------------------------
 					if ( fj >= fb){
 						b = j;
 						fb = fj;	
 					} 
-					fjMap.put(j, fj);
-					//System.out.printf("size of fjMap: %d\n",fjMap.size());//-------------------------------------------------------------------
- 				}
 
- 				
- 				// for (Map.Entry<Integer, Float> entry: fjMap.entrySet()){
- 				// 	System.out.printf("%d --> %f\n",entry.getKey(),entry.getValue());
- 				// }
+					fjMap.put(j, fj);
+ 				}
 
  				// remove b to calculate for g 
  				fjMap.remove(b);
- 				if ( turn % 2 == 0) printCorrectDice[p1Score][p2Score] = b; 
+ 				if ( turn % 2 == 0) printCorrectDice[p1Score][p2Score] = b; // <----------------error 
  				else printCorrectDice[p2Score][p1Score] = b;
-
- 				// System.out.printf(" b: %d\n", b);//-------------------------------------------------------------------
- 				// System.out.printf(" fb: %f\n", fb);//-------------------------------------------------------------------
 
  				// g is the sum of fj's where j != b 
  				float g = 0.0f;
@@ -89,23 +70,18 @@ public class Main {
  				// pb is the probabilty of player rolling b number of dice 
  				float pb = (t*fb + M)/(t*fb +( NDICE )* M);
 
- 				//System.out.printf(" pb: %f\n", pb);//-------------------------------------------------------------------
-
  				int howManyDice = -1;
  				float throwDice = rand.nextFloat();
- 				//System.out.printf(" throwDice: %f\n", throwDice); //-------------------------------------------------------------------
  				if ( throwDice <= pb) howManyDice = b;
  				else {
  					float temp = pb; // accumulate probability
  					for ( Map.Entry < Integer, Float > entry : fjMap.entrySet()){
- 						//System.out.println(" iterating over keySet");//-------------------------------------------------------------------
+ 	
  						float fj = entry.getValue();
  						float pj = (1-pb) * (t*fj + M)/(g*t+(NDICE-1)*M);
- 						//System.out.printf(" pj: %f\n", pj);//-------------------------------------------------------------------
-
+ 						
  						temp += pj;
  						// if within range set value of key fj as the number of dice to throw 
- 						//System.out.printf(" temp += pj: %f\n", temp);//-------------------------------------------------------------------
 
  						if( throwDice <= temp){
  							howManyDice = entry.getKey();
@@ -116,11 +92,10 @@ public class Main {
 
  				// throw dice 
  				int rollSum = 0;
- 				//System.out.printf(" howManyDice: %d \n", howManyDice);//-------------------------------------------------------------------
  				for ( int i = 0; i < howManyDice; i ++){
  					rollSum += rand.nextInt(NSIDES) + 1;
- 					//System.out.printf(" rollSum: %d\n", rollSum);//-------------------------------------------------------------------
  				}
+
  				// player1 turn 
  				if ( turn % 2 == 0){
  					int [] state = {p1Score,p2Score,howManyDice};
@@ -135,28 +110,12 @@ public class Main {
  				}
 
  				// increment turn to next opponent
- 				turn ++;
- 				//System.out.printf(" p1Score: %d\n", p1Score);//-------------------------------------------------------------------
- 				//System.out.printf(" p2Score: %d\n", p2Score);//-------------------------------------------------------------------
- 				
+ 				turn ++; 				
 			}// end of while 
-
-
-			// for ( int[] state : p1StateList){
-			// 	System.out.printf("[ %d, %d, %d ] -- ",state[0],state[1], state[2]);
-			// }
-			// System.out.println();
-
-			// for ( int[] state : p2StateList){
-			// 	System.out.printf("[ %d, %d, %d ] -- ",state[0],state[1], state[2]);
-			// }
-			// System.out.println();
-
 
 			// player 1 won 
 			// insert p1StateList to winCount and p2StateList to loseCount  
 			if ( p1Score > p2Score && p1Score <= UTARGET ){
-				//System.out.println(" winner is A");//-------------------------------------------------------------------
 				for ( int[] state : p1StateList){
 					winCount[state[0]][state[1]][state[2]] += 1;
 				}
@@ -169,7 +128,6 @@ public class Main {
 			// player 2 won
 			// vice versa 
 			else {
-				//System.out.println(" winner is B");//-------------------------------------------------------------------
 				for ( int[] state : p2StateList){
 					winCount[state[0]][state[1]][state[2]] += 1;
 				}
@@ -178,32 +136,9 @@ public class Main {
 					loseCount[state[0]][state[1]][state[2]] += 1;
 				}
 			}
-
-		// for ( int i = 0; i < LTARGET ; i++){
-		// 	for (int j = 0; j < LTARGET; j++){
-		// 		for ( int k = 1; k < NDICE +1; k ++){
-		// 			System.out.print(winCount[i][j][k] + " ");
-		// 		}
-		// 		System.out.print(" / ");
-		// 	}
-		// 	System.out.println();	
-		// }
-
-		// System.out.println();
-		// for ( int i = 0; i < LTARGET ; i++){
-		// 	for (int j = 0; j < LTARGET; j++){
-		// 		for ( int k = 1; k < NDICE +1; k ++){
-		// 			System.out.print(loseCount[i][j][k] + " ");
-		// 		}
-		// 		System.out.print(" / ");
-		// 	}
-		// 	System.out.println();
-		// }
-
-
 		}// end of for
 
-		System.out.printf("Game: NSides = %d LTARGET = %d UTARGET = %d NDice = %d\n",NSIDES , LTARGET, UTARGET, NDICE);
+		System.out.printf("Game: NSides = %d LTARGET = %d UTARGET = %d NDice = %d\n\n",NSIDES , LTARGET, UTARGET, NDICE);
 		// print two LTARGET * LTARGET array 
 		System.out.println("Play =");
 		for ( int i = 0; i < LTARGET; i++){
@@ -222,29 +157,6 @@ public class Main {
 				int temp = winCount[i][j][printCorrectDice[i][j]] + loseCount[i][j][printCorrectDice[i][j]];
 				if ( temp == 0) System.out.print("-1.0000  ");
 				else System.out.printf("%7.4f  ", (float) winCount[i][j][printCorrectDice[i][j]]/ temp);
-			}
-			System.out.println();
-		}
-
-
-
-				for ( int i = 0; i < LTARGET ; i++){
-			for (int j = 0; j < LTARGET; j++){
-				for ( int k = 1; k < NDICE +1; k ++){
-					System.out.print(winCount[i][j][k] + " ");
-				}
-				System.out.print(" / ");
-			}
-			System.out.println();	
-		}
-
-		System.out.println();
-		for ( int i = 0; i < LTARGET ; i++){
-			for (int j = 0; j < LTARGET; j++){
-				for ( int k = 1; k < NDICE +1; k ++){
-					System.out.print(loseCount[i][j][k] + " ");
-				}
-				System.out.print(" / ");
 			}
 			System.out.println();
 		}
