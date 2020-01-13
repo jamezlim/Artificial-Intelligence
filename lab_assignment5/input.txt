@@ -1,0 +1,1 @@
+S(NP(Name(Amy)),VP(Verb(gave),NP(Det(the),Adj(pretty),Noun(flowers)),PP(Prep(to),NP(Det(the),Adj(small),Noun(boy))))).
